@@ -15,5 +15,8 @@ data/
 # Tensorboard dump dir
 runs/
 
+# Virtual environment
+.venv/
+
 # OS specific
 .DS_Store
