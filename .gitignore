@@ -17,6 +17,12 @@ runs/
 
 # Virtual environment
 .venv/
+.envs/
 
 # OS specific
 .DS_Store
+
+# Data
+.nltk_data.lnk
+.vector_cache/
+.vscode/
