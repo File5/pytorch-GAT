@@ -256,11 +256,16 @@ def view_pydot(pdot):
     plt = SVG(pdot.create_svg())
     display(plt)
 
-def extend_wn_neighbors(g_node_synsets, g_node_features_words, g_node_labels_words, g_edge_index):
+def extend_wn_neighbors(g_node_synsets, synsets_to_classes, classes_to_synsets):
     graph = pydot.Dot("my_graph", graph_type="digraph")
+    for node_synset in g_node_synsets:
+        extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset, graph)
+    graph.write_svg('graph.svg')
 
+def extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset, graph):
+    def sc(s):
+        return get_synset_class(synsets_to_classes, classes_to_synsets, s)
 
-def extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset):
     next_idx = len(synsets_to_classes)
     start = node_synset
 
@@ -271,6 +276,8 @@ def extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset
         []
     ]
 
+    if start not in dataset.entity2id:
+        return
     start_id = dataset.entity2id[start]
     start_n = pydot.Node(start)
     graph.add_node(start_n)
@@ -288,10 +295,10 @@ def extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset
                 graph.add_node(dest_n)
             edge_id = edg.item()
             edge = dataset.id2edge[edge_id]
-            edge_index_extension[0].append(src)
-            edge_index_extension[1].append(edge_id)
-            edge_index_extension[0].append(edge_id)
-            edge_index_extension[1].append(dst_id)
+            edge_index_extension[0].append(sc(start))
+            edge_index_extension[1].append(sc(edge))
+            edge_index_extension[0].append(sc(edge))
+            edge_index_extension[1].append(sc(dest))
             graph.add_edge(pydot.Edge(src_n, dest_n, label=edge))
         elif dst == start_id:
             dest_n = start_n
@@ -303,8 +310,10 @@ def extend_wn_neighbors_node(synsets_to_classes, classes_to_synsets, node_synset
                 graph.add_node(src_n)
             edge_id = edg.item()
             edge = dataset.id2edge[edge_id]
-            edge_index_extension[0].append(src)
-            edge_index_extension[1].append(dst)
+            edge_index_extension[0].append(sc(src))
+            edge_index_extension[1].append(sc(edge))
+            edge_index_extension[0].append(sc(edge))
+            edge_index_extension[1].append(sc(start))
             graph.add_edge(pydot.Edge(src_n, dest_n, label=edge))
     return graph
 #graph = extend_wn_neighbors(None)
@@ -368,6 +377,8 @@ g_edge_index = torch.tensor([
     [1, 2, 3, 4, 5, 6],
 ], dtype=torch.long)
 append_graph(g_node_synsets, g_node_features_words, g_node_labels_words, g_edge_index)
+extend_wn_neighbors(g_node_synsets, synsets_to_classes, classes_to_synsets)
+exit(0)
 
 # Graph 2        # 0              1            2
 g_node_synsets = ['person.n.01', 'hold.v.02', 'plant.n.02']
