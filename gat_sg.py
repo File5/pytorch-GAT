@@ -256,17 +256,16 @@ def view_pydot(pdot):
     plt = SVG(pdot.create_svg())
     display(plt)
 
-def extend_wn_neighbors(g_node_synsets, g_node_labels_words, g_edge_index):
+def extend_wn_neighbors(g_node_synsets, node_synsets_extension, g_node_labels_words, g_edge_index):
     graph = pydot.Dot("my_graph", graph_type="digraph")
     for node_synset in g_node_synsets:
-        extend_wn_neighbors_node(node_synset, g_node_synsets, g_node_labels_words, g_edge_index, graph)
+        extend_wn_neighbors_node(node_synset, g_node_synsets, node_synsets_extension, g_node_labels_words, g_edge_index, graph)
     graph.write_svg('graph.svg')
 
-def extend_wn_neighbors_node(node_synset, g_node_synsets, g_node_labels_words, g_edge_index, graph):
+def extend_wn_neighbors_node(node_synset, g_node_synsets, node_synsets_extension, g_node_labels_words, g_edge_index, graph):
     start = node_synset
 
-    existing_synsets = set(g_node_synsets)
-    node_synsets_extension = []
+    existing_synsets = set(g_node_synsets + node_synsets_extension)
     edge_index_extension = [
         [],
         []
@@ -344,7 +343,7 @@ edge_index_list = []
 node_features_list = []
 node_labels_list = []
 
-node_synsets_list = []
+#node_synsets_extension = []
 synsets_to_classes = {}
 classes_to_synsets = []
 
@@ -395,11 +394,12 @@ g_edge_index = [
     [0, 1, 0, 3, 4, 5],
     [1, 2, 3, 4, 5, 6],
 ]
+g_node_synsets_extension = []
 init_classes(g_node_synsets)
-extend_wn_neighbors(g_node_synsets, g_node_labels_words, g_edge_index)
+extend_wn_neighbors(g_node_synsets, g_node_synsets_extension, g_node_labels_words, g_edge_index)
 g_edge_index = torch.tensor(g_edge_index, dtype=torch.long)
+g_node_synsets.extend(g_node_synsets_extension)
 append_graph(g_node_synsets, g_node_labels_words, g_edge_index)
-exit(0)
 
 # Graph 2        # 0              1            2
 g_node_synsets = ['person.n.01', 'hold.v.02', 'plant.n.02']
@@ -408,9 +408,11 @@ g_edge_index = [
     [0, 1],
     [1, 2],
 ]
+g_node_synsets_extension = []
 init_classes(g_node_synsets)
-extend_wn_neighbors(g_node_synsets, g_edge_index)
+extend_wn_neighbors(g_node_synsets, g_node_synsets_extension, g_node_labels_words, g_edge_index)
 g_edge_index = torch.tensor(g_edge_index, dtype=torch.long)
+g_node_synsets.extend(g_node_synsets_extension)
 append_graph(g_node_synsets, g_node_labels_words, g_edge_index)
 
 # Graph 3        # 0              1            2             3               4
@@ -420,9 +422,11 @@ g_edge_index = [
     [0, 1, 2, 3],
     [1, 2, 3, 4],
 ]
+g_node_synsets_extension = []
 init_classes(g_node_synsets)
-extend_wn_neighbors(g_node_synsets, g_edge_index)
+extend_wn_neighbors(g_node_synsets, g_node_synsets_extension, g_node_labels_words, g_edge_index)
 g_edge_index = torch.tensor(g_edge_index, dtype=torch.long)
+g_node_synsets.extend(g_node_synsets_extension)
 append_graph(g_node_synsets, g_node_labels_words, g_edge_index)
 
 # Graph 4=1      # 0              1            2            3          4
@@ -432,9 +436,11 @@ g_edge_index = [
     [0, 1, 2, 3],
     [1, 2, 3, 4],
 ]
+g_node_synsets_extension = []
 init_classes(g_node_synsets)
-extend_wn_neighbors(g_node_synsets, g_edge_index)
+extend_wn_neighbors(g_node_synsets, g_node_synsets_extension, g_node_labels_words, g_edge_index)
 g_edge_index = torch.tensor(g_edge_index, dtype=torch.long)
+g_node_synsets.extend(g_node_synsets_extension)
 append_graph(g_node_synsets, g_node_labels_words, g_edge_index)
 
 print(node_features_list[0].shape, node_features_list[0].dtype)
